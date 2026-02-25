@@ -88,15 +88,58 @@
         <div class="bg-glass backdrop-blur-xl border border-glassBorder rounded-3xl p-8 md:p-10 shadow-2xl mb-20 transform transition hover:scale-[1.01] duration-500">
             <form id="analysis-form" class="space-y-8">
                 
+                <div class="grid md:grid-cols-1 gap-8 mb-8">
+                    <div class="group">
+                        <label class="block text-sm font-medium text-gray-400 mb-4 transition group-hover:text-neonBlue">AI PROVIDER</label>
+                        <div class="flex flex-row gap-4 md:w-1/2">
+                            <label class="flex-1 relative cursor-pointer">
+                                <input type="radio" name="provider" value="google" class="peer sr-only" checked>
+                                <div class="w-full bg-black/30 border border-gray-700 text-gray-400 rounded-xl px-5 py-4 focus:outline-none transition-all duration-300 text-center peer-checked:border-neonBlue peer-checked:text-white peer-checked:bg-neonBlue/10 hover:border-gray-500">
+                                    Google Gemini
+                                </div>
+                                <div class="absolute inset-0 rounded-xl bg-neonBlue opacity-0 transition duration-300 -z-10 blur peer-checked:opacity-10"></div>
+                            </label>
+                            <label class="flex-1 relative cursor-pointer">
+                                <input type="radio" name="provider" value="openai" class="peer sr-only" >
+                                <div class="w-full bg-black/30 border border-gray-700 text-gray-400 rounded-xl px-5 py-4 focus:outline-none transition-all duration-300 text-center peer-checked:border-neonBlue peer-checked:text-white peer-checked:bg-neonBlue/10 hover:border-gray-500">
+                                    OpenAI
+                                </div>
+                                <div class="absolute inset-0 rounded-xl bg-neonBlue opacity-0 transition duration-300 -z-10 blur peer-checked:opacity-10"></div>
+                            </label>
+                            
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid md:grid-cols-1 gap-8">
                     <div class="group">
-                        <label for="api-key" class="block text-sm font-medium text-gray-400 mb-2 transition group-hover:text-neonBlue">MEMBER ACCESS KEY (OpenAI API)</label>
+                        <label for="api-key" id="api-key-label" class="block text-sm font-medium text-gray-400 mb-2 transition group-hover:text-neonBlue">MEMBER ACCESS KEY (Gemini API)</label>
                         <div class="relative">
                             <input type="password" id="api-key" required 
                                 class="w-full bg-black/30 border border-gray-700 text-white rounded-xl px-5 py-4 focus:outline-none focus:border-neonBlue focus:ring-1 focus:ring-neonBlue transition-all duration-300 placeholder-gray-600 font-mono text-sm"
-                                placeholder="sk-...">
+                                placeholder="AIza...">
                             <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-neonBlue to-neonPurple opacity-0 transition duration-300 -z-10 blur group-hover:opacity-20"></div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="group">
+                    <label class="block text-sm font-medium text-gray-400 mb-4 transition group-hover:text-neonBlue">LANGUAGE</label>
+                    <div class="flex flex-row gap-4 md:w-1/2">
+                        <label class="flex-1 relative cursor-pointer">
+                            <input type="radio" name="language" value="arabic" class="peer sr-only" checked>
+                            <div class="w-full bg-black/30 border border-gray-700 text-gray-400 rounded-xl px-5 py-4 focus:outline-none transition-all duration-300 text-center peer-checked:border-neonBlue peer-checked:text-white peer-checked:bg-neonBlue/10 hover:border-gray-500">
+                                عربي
+                            </div>
+                            <div class="absolute inset-0 rounded-xl bg-neonBlue opacity-0 transition duration-300 -z-10 blur peer-checked:opacity-10"></div>
+                        </label>
+                        <label class="flex-1 relative cursor-pointer">
+                            <input type="radio" name="language" value="english" class="peer sr-only" >
+                            <div class="w-full bg-black/30 border border-gray-700 text-gray-400 rounded-xl px-5 py-4 focus:outline-none transition-all duration-300 text-center peer-checked:border-neonBlue peer-checked:text-white peer-checked:bg-neonBlue/10 hover:border-gray-500">
+                                English
+                            </div>
+                            <div class="absolute inset-0 rounded-xl bg-neonBlue opacity-0 transition duration-300 -z-10 blur peer-checked:opacity-10"></div>
+                        </label>
                     </div>
                 </div>
 
@@ -113,7 +156,7 @@
                 <button type="submit" id="submit-btn" class="w-full relative group overflow-hidden rounded-xl p-[1px]">
                     <div class="absolute inset-0 bg-gradient-to-r from-neonBlue via-neonPurple to-neonBlue opacity-70 group-hover:opacity-100 animate-gradient-x transition-opacity duration-300"></div>
                     <div class="relative bg-black rounded-xl px-8 py-5 flex items-center justify-center space-x-3 transition-colors duration-300 group-hover:bg-black/80">
-                        <span class="btn-text font-bold text-xl tracking-widest text-white">INITIALIZE ANALYSIS</span>
+                        <span class="btn-text font-bold text-xl tracking-wide text-white">ابدأ التحليل</span>
                         <div class="spinner hidden ml-3 w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     </div>
                 </button>
@@ -214,6 +257,46 @@
         const spinner = submitBtn.querySelector('.spinner');
         const results = document.getElementById('results');
         const errorMessage = document.getElementById('error-message');
+        const providerRadios = document.querySelectorAll('input[name="provider"]');
+        const apiKeyLabel = document.getElementById('api-key-label');
+        const apiKeyInput = document.getElementById('api-key');
+        const ideaInput = document.getElementById('idea');
+        const languageRadios = document.querySelectorAll('input[name="language"]');
+
+        const placeholders = {
+            arabic: "صف فكرتك الاستثمارية بعمق هنا... النظام سيقوم بتحليلها عبر 3 مسارات متوازية.",
+            english: "Describe your investment idea in depth here... The system will analyze it through 3 parallel paths."
+        };
+
+        const buttonTexts = {
+            arabic: "ابدأ التحليل",
+            english: "INITIALIZE ANALYSIS"
+        };
+
+        const loadingTexts = {
+            arabic: "جاري تحليل البيانات...",
+            english: "PROCESSING DATA STREAMS..."
+        };
+
+        languageRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const lang = e.target.value;
+                ideaInput.placeholder = placeholders[lang];
+                btnText.textContent = buttonTexts[lang];
+            });
+        });
+
+        providerRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.value === 'google') {
+                    apiKeyLabel.textContent = 'MEMBER ACCESS KEY (Gemini API)';
+                    apiKeyInput.placeholder = 'AIza...';
+                } else {
+                    apiKeyLabel.textContent = 'MEMBER ACCESS KEY (OpenAI API)';
+                    apiKeyInput.placeholder = 'sk-...';
+                }
+            });
+        });
 
         // Configure Marked.js options
         marked.setOptions({
@@ -227,9 +310,11 @@
             
             const apiKey = document.getElementById('api-key').value;
             const idea = document.getElementById('idea').value;
+            const provider = document.querySelector('input[name="provider"]:checked').value;
+            const language = document.querySelector('input[name="language"]:checked').value;
             
             // UI Loading State
-            btnText.textContent = 'PROCESSING DATA STREAMS...';
+            btnText.textContent = loadingTexts[language];
             spinner.classList.remove('hidden');
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-80', 'cursor-wait');
@@ -244,7 +329,7 @@
                 const response = await fetch('/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idea, api_key: apiKey })
+                    body: JSON.stringify({ idea, api_key: apiKey, provider, language })
                 });
                 
                 const data = await response.json();
@@ -254,10 +339,10 @@
                 }
                 
                 // Render Markdown content using marked.parse()
-                document.getElementById('market-result').innerHTML = marked.parse(data.market_analysis);
-                document.getElementById('financial-result').innerHTML = marked.parse(data.financial_analysis);
-                document.getElementById('competitive-result').innerHTML = marked.parse(data.competitive_analysis);
-                document.getElementById('final-verdict').innerHTML = marked.parse(data.final_verdict);
+                document.getElementById('market-result').innerHTML = marked.parse(data.market_analysis || '*No response generated.*');
+                document.getElementById('financial-result').innerHTML = marked.parse(data.financial_analysis || '*No response generated.*');
+                document.getElementById('competitive-result').innerHTML = marked.parse(data.competitive_analysis || '*No response generated.*');
+                document.getElementById('final-verdict').innerHTML = marked.parse(data.final_verdict || '*No response generated.*');
                 
                 // Reveal Results with animation
                 results.classList.remove('hidden');
@@ -272,7 +357,7 @@
                 errorMessage.classList.remove('hidden');
             } finally {
                 // Reset UI State
-                btnText.textContent = 'INITIALIZE ANALYSIS';
+                btnText.textContent = buttonTexts[language];
                 spinner.classList.add('hidden');
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('opacity-80', 'cursor-wait');
