@@ -74,25 +74,54 @@ async def run_analysis(idea: str, api_key: str, provider: str, language: str) ->
     financial_task = financial_agent.analyze(idea, api_key, provider, language)
     competitive_task = competitive_agent.analyze(idea, api_key, provider, language)
 
-    market_result, financial_result, competitive_result = await asyncio.gather(
+    market_result_dict, financial_result_dict, competitive_result_dict = await asyncio.gather(
         market_task,
         financial_task,
         competitive_task,
     )
 
-    final_verdict = await synthesizer.synthesize(
+    market_result_text = market_result_dict["text"]
+    financial_result_text = financial_result_dict["text"]
+    competitive_result_text = competitive_result_dict["text"]
+
+    final_verdict_dict = await synthesizer.synthesize(
         idea=idea,
-        market_analysis=market_result,
-        financial_analysis=financial_result,
-        competitive_analysis=competitive_result,
+        market_analysis=market_result_dict,
+        financial_analysis=financial_result_dict,
+        competitive_analysis=competitive_result_dict,
         api_key=api_key,
         provider=provider,
         language=language,
     )
+    final_verdict_text = final_verdict_dict["text"]
+
+    # Aggregate usage metadata
+    total_prompt_tokens = (
+        market_result_dict["usage_metadata"]["prompt_token_count"] +
+        financial_result_dict["usage_metadata"]["prompt_token_count"] +
+        competitive_result_dict["usage_metadata"]["prompt_token_count"] +
+        final_verdict_dict["usage_metadata"]["prompt_token_count"]
+    )
+    total_completion_tokens = (
+        market_result_dict["usage_metadata"]["candidates_token_count"] +
+        financial_result_dict["usage_metadata"]["candidates_token_count"] +
+        competitive_result_dict["usage_metadata"]["candidates_token_count"] +
+        final_verdict_dict["usage_metadata"]["candidates_token_count"]
+    )
+
+    # Assuming all agents use the same provider and model_level for simplicity in reporting
+    # You might want to refine this if different agents use different models
+    aggregated_usage_metadata = {
+        "provider": provider,
+        "model_level": market_result_dict["usage_metadata"]["model_level"], # Or from any other agent
+        "total_prompt_tokens": total_prompt_tokens,
+        "total_completion_tokens": total_completion_tokens,
+    }
 
     return {
-        "market_analysis": market_result,
-        "financial_analysis": financial_result,
-        "competitive_analysis": competitive_result,
-        "final_verdict": final_verdict,
+        "market_analysis": market_result_text,
+        "financial_analysis": financial_result_text,
+        "competitive_analysis": competitive_result_text,
+        "final_verdict": final_verdict_text,
+        "usage_metadata": aggregated_usage_metadata,
     }

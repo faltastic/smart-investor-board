@@ -167,6 +167,28 @@
 
         <!-- Results Section -->
         <div id="results" class="hidden space-y-16">
+            <!-- Usage Statistics Section -->
+            <div id="usage-stats" class="hidden text-center mb-10 p-6 bg-glass backdrop-blur-md border border-glassBorder rounded-2xl shadow-xl">
+                <p class="text-lg font-semibold text-gray-300 mb-4">Analysis Overview</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-gray-400 text-sm font-mono tracking-wide">
+                    <div>
+                        <span class="block text-neonBlue font-bold">Provider:</span>
+                        <span id="usage-provider" class="text-white"></span>
+                    </div>
+                    <div>
+                        <span class="block text-neonBlue font-bold">Model Tier:</span>
+                        <span id="usage-model-level" class="text-white"></span>
+                    </div>
+                    <div>
+                        <span class="block text-neonBlue font-bold">Prompt Tokens:</span>
+                        <span id="usage-prompt-tokens" class="text-white"></span>
+                    </div>
+                    <div>
+                        <span class="block text-neonBlue font-bold">Completion Tokens:</span>
+                        <span id="usage-completion-tokens" class="text-white"></span>
+                    </div>
+                </div>
+            </div>
             
             <!-- Layer 1: Divergence -->
             <section>
@@ -183,7 +205,7 @@
                             <div class="p-6 border-b border-white/5 bg-gradient-to-b from-blue-500/10 to-transparent">
                                 <div class="flex justify-between items-center">
                                     <h3 class="text-xl font-bold text-blue-400">Market Logic</h3>
-                                    <span class="text-xs font-mono text-blue-500/70 border border-blue-500/30 px-2 py-1 rounded">GPT-5-MINI</span>
+                                    <!-- <span class="text-xs font-mono text-blue-500/70 border border-blue-500/30 px-2 py-1 rounded">GPT-5-MINI</span> -->
                                 </div>
                             </div>
                             <div class="p-6 prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed markdown-content" id="market-result"></div>
@@ -196,7 +218,7 @@
                             <div class="p-6 border-b border-white/5 bg-gradient-to-b from-emerald-500/10 to-transparent">
                                 <div class="flex justify-between items-center">
                                     <h3 class="text-xl font-bold text-emerald-400">Financials</h3>
-                                    <span class="text-xs font-mono text-emerald-500/70 border border-emerald-500/30 px-2 py-1 rounded">GPT-5-MINI</span>
+                                    <!-- <span class="text-xs font-mono text-emerald-500/70 border border-emerald-500/30 px-2 py-1 rounded">GPT-5-MINI</span> -->
                                 </div>
                             </div>
                             <div class="p-6 prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed markdown-content" id="financial-result"></div>
@@ -209,7 +231,7 @@
                             <div class="p-6 border-b border-white/5 bg-gradient-to-b from-violet-500/10 to-transparent">
                                 <div class="flex justify-between items-center">
                                     <h3 class="text-xl font-bold text-violet-400">Competitive</h3>
-                                    <span class="text-xs font-mono text-violet-500/70 border border-violet-500/30 px-2 py-1 rounded">GPT-5-MINI</span>
+                                    <!-- <span class="text-xs font-mono text-violet-500/70 border border-violet-500/30 px-2 py-1 rounded">GPT-5-MINI</span> -->
                                 </div>
                             </div>
                             <div class="p-6 prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed markdown-content" id="competitive-result"></div>
@@ -343,7 +365,23 @@
                 document.getElementById('financial-result').innerHTML = marked.parse(data.financial_analysis || '*No response generated.*');
                 document.getElementById('competitive-result').innerHTML = marked.parse(data.competitive_analysis || '*No response generated.*');
                 document.getElementById('final-verdict').innerHTML = marked.parse(data.final_verdict || '*No response generated.*');
+
+                // Populate Usage Statistics
+                if (data.usage_metadata) {
+                    document.getElementById('usage-provider').textContent = data.usage_metadata.provider;
+                    document.getElementById('usage-model-level').textContent = data.usage_metadata.model_level;
+                    document.getElementById('usage-prompt-tokens').textContent = data.usage_metadata.total_prompt_tokens;
+                    document.getElementById('usage-completion-tokens').textContent = data.usage_metadata.total_completion_tokens;
+                    document.getElementById('usage-stats').classList.remove('hidden');
+                }
                 
+                // Set text direction for results section
+                if (language === 'english') {
+                    results.setAttribute('dir', 'ltr');
+                } else {
+                    results.setAttribute('dir', 'rtl');
+                }
+
                 // Reveal Results with animation
                 results.classList.remove('hidden');
                 

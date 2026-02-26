@@ -59,13 +59,13 @@ cd investment-agent
 ### 3. تثبيت المكتبات اللازمة
 قم بتثبيت المتطلبات المسجلة في ملف `requirements.txt`:
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 ### 4. تشغيل التطبيق
 قم بتشغيل خادم Fastapi:
 ```bash
-uvicorn main:app --reload
+uv run uvicorn main:app --reload
 ```
 
 سيقوم المتصفح بفتح العنوان `http://localhost:8000` تلقائياً.

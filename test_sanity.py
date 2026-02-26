@@ -13,20 +13,20 @@ SYSTEM_PROMPT = {
 
 
 async def demo():
-   
+
     agent = MarketLogicAgent()
 
     # Minimal test payload – you can replace the strings with anything.
     idea = "Invest in solar panel manufacturing in North Africa."
-    dummy_api_key = "sk-fakekey-fortesting"   # No real request will succeed.
+    dummy_api_key = "fake-key-for-testing"  # No real request will succeed.
 
     try:
         # The `analyze` coroutine is awaited directly.
         result = await agent.analyze(
             idea=idea,
             api_key=dummy_api_key,
-            provider="google",   # or "google" if you have a Gemini key
-            language="english"
+            provider="google",  # or "google" if you have a Gemini key
+            language="english",
         )
         print("\n✅  Agent returned a response:")
         print(result)

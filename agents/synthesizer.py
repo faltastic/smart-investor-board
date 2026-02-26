@@ -1,5 +1,4 @@
-from openai import AsyncOpenAI
-import google.generativeai as genai
+from .base import BaseAgent
 from .config import MODELS
 
 SYSTEM_PROMPT = {
@@ -63,21 +62,24 @@ Choose one: [Invest aggressively | Invest cautiously | Watch and wait | Don't in
 }
 
 
-class SynthesizerAgent:
+class SynthesizerAgent(BaseAgent):
     def __init__(self):
-        self.model_level = "high"
-        self.system_prompt = SYSTEM_PROMPT
+        super().__init__(model_level="high", system_prompt=SYSTEM_PROMPT)
 
     async def synthesize(
         self,
         idea: str,
-        market_analysis: str,
-        financial_analysis: str,
-        competitive_analysis: str,
+        market_analysis: dict,
+        financial_analysis: dict,
+        competitive_analysis: dict,
         api_key: str,
-        provider: str = "openai",
-        language: str = "arabic",
-    ) -> str:
+        provider: str,
+        language: str,
+    ) -> dict:
+        market_text = market_analysis["text"]
+        financial_text = financial_analysis["text"]
+        competitive_text = competitive_analysis["text"]
+
         if language == "english":
             user_message = f"""Investment Idea:
 {idea}
@@ -85,17 +87,17 @@ class SynthesizerAgent:
 ---
 
 Market Logic Analysis:
-{market_analysis}
+{market_text}
 
 ---
 
 Financial Sustainability Analysis:
-{financial_analysis}
+{financial_text}
 
 ---
 
 Competitive Resilience Analysis:
-{competitive_analysis}
+{competitive_text}
 
 ---
 
@@ -107,44 +109,27 @@ Based on the three analyses above, provide your final investment judgment and st
 ---
 
 تحليل منطق السوق:
-{market_analysis}
+{market_text}
 
 ---
 
 تحليل الاستدامة المالية:
-{financial_analysis}
+{financial_text}
 
 ---
 
 تحليل المتانة التنافسية:
-{competitive_analysis}
+{competitive_text}
 
 ---
 
 بناءً على التحليلات الثلاثة أعلاه، قدم حكمك الاستثماري النهائي والاستشارة الاستراتيجية."""
-        model_name = MODELS.get(provider, MODELS["openai"]).get(self.model_level)
-        system_instruction = self.system_prompt.get(
-            language, self.system_prompt["arabic"]
+
+        return await self.analyze(
+            idea=user_message,
+            api_key=api_key,
+            provider=provider,
+            language=language,
+            temperature=0.5,
+            max_tokens=5000,
         )
-        if provider == "google":
-            genai.configure(api_key=api_key)
-            model = genai.GenerativeModel(model_name)
-            response = await model.generate_content_async(
-                contents=[user_message],
-                system_instruction=system_instruction,
-                temperature=0.5,
-                max_output_tokens=2000,
-            )
-            return response.text
-        else:
-            client = AsyncOpenAI(api_key=api_key)
-            response = await client.chat.completions.create(
-                model=model_name,
-                messages=[
-                    {"role": "system", "content": system_instruction},
-                    {"role": "user", "content": user_message},
-                ],
-                temperature=0.5,
-                max_tokens=2000,
-            )
-            return response.choices[0].message.content
