@@ -1,22 +1,17 @@
 from openai import AsyncOpenAI
-from google import genai
-from google.genai import types
+import google.generativeai as genai
 from .config import MODELS
 
-
 SYSTEM_PROMPT = {
-    "english": """"You are the general partner and the ultimate investment decision-maker.
+    "english": """You are the general partner and the ultimate investment decision-maker.
 
 Your role: To receive analyses from three expert analysts (market logic, financial sustainability, competitive resilience) and integrate them into a comprehensive final judgment.
 
 When making the decision:
 
 1. Weigh the conflicting arguments from the three analysts
-
 2. Identify points of agreement and disagreement between the analyses
-
 3. Assess the overall risk versus opportunity
-
 4. Make a clear investment judgment
 
 Your response should be structured as follows:
@@ -36,7 +31,7 @@ Choose one: [Invest aggressively | Invest cautiously | Watch and wait | Don't in
 (From 1-10 with justification)
 
 ## Strategic Advice
-(Practical advice for the investor) """,
+(Practical advice for the investor)""",
     "arabic": """أنت الشريك العام وصانع القرار الاستثماري النهائي.
 
 دورك: استلام تحليلات ثلاثة محللين متخصصين (منطق السوق، الاستدامة المالية، المتانة التنافسية) ودمجها في حكم نهائي شامل.
@@ -127,26 +122,22 @@ Based on the three analyses above, provide your final investment judgment and st
 ---
 
 بناءً على التحليلات الثلاثة أعلاه، قدم حكمك الاستثماري النهائي والاستشارة الاستراتيجية."""
-
         model_name = MODELS.get(provider, MODELS["openai"]).get(self.model_level)
-        system_instruction = self.system_prompt.get(language, self.system_prompt["arabic"])
-
+        system_instruction = self.system_prompt.get(
+            language, self.system_prompt["arabic"]
+        )
         if provider == "google":
-            client = genai.Client(api_key=api_key)
-
-            response = await client.aio.models.generate_content(
-                model=model_name,
-                contents=user_message,
-                config=types.GenerateContentConfig(
-                    system_instruction=system_instruction,
-                    temperature=0.5,
-                    max_output_tokens=2000,
-                ),
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel(model_name)
+            response = await model.generate_content_async(
+                contents=[user_message],
+                system_instruction=system_instruction,
+                temperature=0.5,
+                max_output_tokens=2000,
             )
             return response.text
         else:
             client = AsyncOpenAI(api_key=api_key)
-
             response = await client.chat.completions.create(
                 model=model_name,
                 messages=[
@@ -156,5 +147,4 @@ Based on the three analyses above, provide your final investment judgment and st
                 temperature=0.5,
                 max_tokens=2000,
             )
-
             return response.choices[0].message.content

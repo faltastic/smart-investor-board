@@ -63,12 +63,12 @@ pip install -r requirements.txt
 ```
 
 ### 4. تشغيل التطبيق
-قم بتشغيل خادم Flask:
+قم بتشغيل خادم Fastapi:
 ```bash
-python app.py
+uvicorn main:app --reload
 ```
 
-سيقوم المتصفح بفتح العنوان `http://localhost:5000` تلقائياً.
+سيقوم المتصفح بفتح العنوان `http://localhost:8000` تلقائياً.
 
 ## 💡 كيفية الاستخدام
 
@@ -80,7 +80,7 @@ python app.py
 
 ## 📂 هيكلية المشروع
 
-*   `app.py`: ملف التشغيل الرئيسي ونقاط الاتصال (Endpoints).
+*   `main.py`: ملف التشغيل الرئيسي ونقاط الاتصال (Endpoints).
 *   `agents/`: يحتوي على كود العملاء الأذكياء:
     *   `base.py`: الكلاس الأساسي للعملاء.
     *   `market_logic.py`: عميل السوق.
