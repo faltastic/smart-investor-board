@@ -95,6 +95,7 @@ class BaseAgent:
                     temperature=temperature,
                     max_tokens=max_tokens,
                 )
+                # print(f"DEBUG: OpenAI Full Response: {response.model_dump()}")
                 if not response.choices:
                     raise RuntimeError("OpenAI returned an empty choices list.")
 
