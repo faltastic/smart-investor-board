@@ -1,6 +1,37 @@
-from openai import AsyncOpenAI
+from .base import BaseAgent
+from .config import MODELS
 
-SYSTEM_PROMPT = """أنت الشريك العام وصانع القرار الاستثماري النهائي.
+SYSTEM_PROMPT = {
+    "english": """You are the general partner and the ultimate investment decision-maker.
+
+Your role: To receive analyses from three expert analysts (market logic, financial sustainability, competitive resilience) and integrate them into a comprehensive final judgment.
+
+When making the decision:
+
+1. Weigh the conflicting arguments from the three analysts
+2. Identify points of agreement and disagreement between the analyses
+3. Assess the overall risk versus opportunity
+4. Make a clear investment judgment
+
+Your response should be structured as follows:
+## Summary of Analyses
+(A brief summary of what each analyst said)
+
+## Points of Agreement
+(Where the analysts agreed)
+
+## Points of Disagreement
+(Where the opinions differed and how to balance them)
+
+## Final Investment Judgment
+Choose one: [Invest aggressively | Invest cautiously | Watch and wait | Don't invest]
+
+## Overall Rating
+(From 1-10 with justification)
+
+## Strategic Advice
+(Practical advice for the investor)""",
+    "arabic": """أنت الشريك العام وصانع القرار الاستثماري النهائي.
 
 دورك: استلام تحليلات ثلاثة محللين متخصصين (منطق السوق، الاستدامة المالية، المتانة التنافسية) ودمجها في حكم نهائي شامل.
 
@@ -27,54 +58,78 @@ SYSTEM_PROMPT = """أنت الشريك العام وصانع القرار الا
 (من 1-10 مع تبرير)
 
 ## الاستشارة الاستراتيجية
-(نصائح عملية للمستثمر)"""
+(نصائح عملية للمستثمر)""",
+}
 
 
-class SynthesizerAgent:
+class SynthesizerAgent(BaseAgent):
     def __init__(self):
-        self.model = "gpt-5.2"
-        self.system_prompt = SYSTEM_PROMPT
-    
+        super().__init__(model_level="high", system_prompt=SYSTEM_PROMPT)
+
     async def synthesize(
         self,
         idea: str,
-        market_analysis: str,
-        financial_analysis: str,
-        competitive_analysis: str,
-        api_key: str
-    ) -> str:
-        client = AsyncOpenAI(api_key=api_key)
-        
-        user_message = f"""الفكرة الاستثمارية:
+        market_analysis: dict,
+        financial_analysis: dict,
+        competitive_analysis: dict,
+        api_key: str,
+        provider: str,
+        language: str,
+    ) -> dict:
+        market_text = market_analysis["text"]
+        financial_text = financial_analysis["text"]
+        competitive_text = competitive_analysis["text"]
+
+        if language == "english":
+            user_message = f"""Investment Idea:
+{idea}
+
+---
+
+Market Logic Analysis:
+{market_text}
+
+---
+
+Financial Sustainability Analysis:
+{financial_text}
+
+---
+
+Competitive Resilience Analysis:
+{competitive_text}
+
+---
+
+Based on the three analyses above, provide your final investment judgment and strategic advice."""
+        else:
+            user_message = f"""الفكرة الاستثمارية:
 {idea}
 
 ---
 
 تحليل منطق السوق:
-{market_analysis}
+{market_text}
 
 ---
 
 تحليل الاستدامة المالية:
-{financial_analysis}
+{financial_text}
 
 ---
 
 تحليل المتانة التنافسية:
-{competitive_analysis}
+{competitive_text}
 
 ---
 
 بناءً على التحليلات الثلاثة أعلاه، قدم حكمك الاستثماري النهائي والاستشارة الاستراتيجية."""
 
-        response = await client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": user_message}
-            ],
+        return await self.analyze(
+            idea=user_message,
+            api_key=api_key,
+            provider=provider,
+            language=language,
             temperature=0.5,
-            max_tokens=2000
+            max_tokens=5000,
         )
-        
-        return response.choices[0].message.content

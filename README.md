@@ -1,95 +1,26 @@
-# 🔮 المساعد الاستثماري الذكي (Oracle AI)
+# Oracle AI - Smart Investment Assistant
 
-> **شاهد الشرح الكامل للمشروع وطريقة بنائه خطوة بخطوة في الفيديو المميز على يوتيوب:**
-> 
-> [![شرح المشروع على يوتيوب](https://img.youtube.com/vi/S5shoHtZMAk/maxresdefault.jpg)](https://youtu.be/S5shoHtZMAk)
-> 
-> **[اضغط هنا لمشاهدة الفيديو الآن](https://youtu.be/S5shoHtZMAk)** 🚀
+An AI-driven "Smart Investment Committee" that analyzes startup pitches and investment ideas. It uses multiple AI agents (Market, Financial, Competitive, and Synthesizer) running concurrently to evaluate an idea from multiple strategic angles and issue a final verdict (Invest, Caution, Reject).
 
-## 📋 نبذة عن المشروع
+## Setup & Run
 
-هذا المشروع عبارة عن نظام "لجنة استثمار ذكية" تعمل بالذكاء الاصطناعي، مصممة لتحليل الأفكار الاستثمارية والمشاريع الناشئة من عدة زوايا استراتيجية. يقوم النظام بمحاكاة دور ثلاثة محللين متخصصين بالإضافة إلى صانع قرار نهائي، لتقديم تقرير شامل يساعد رواد الأعمال والمستثمرين على اتخاذ قرارات مدروسة.
+**Prerequisites:** Python 3.10+
 
-## 🌟 المميزات الرئيسية
+1. **Install dependencies:**
+   ```bash
+   uv sync
+   # OR: python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+   ```
 
-يعتمد النظام على هيكلية **الماس الموجه (Diamond Structure)** في هندسة التوجيه (Prompt Engineering)، حيث يقوم بتوزيع المهام ثم تجميعها:
+2. **Run the server (FastAPI):**
+   ```bash
+   uvicorn main:app --reload
+   ```
 
-1.  **تحليل منطق السوق (Market Logic Agent)**:
-    *   دراسة حجم السوق والنمو.
-    *   تحليل ديناميكيات العرض والطلب.
-    *   اكتشاف الفجوات السوقية وسلوك المستهلك.
+3. **Access the application:** Open `http://localhost:8000` in your browser.
 
-2.  **تحليل الاستدامة المالية (Financial Agent)**:
-    *   تحليل اقتصاديات الوحدة (Unit Economics).
-    *   دراسة هيكل التكاليف والإيرادات.
-    *   تقدير نقطة التعادل والاحتياجات التمويلية.
-
-3.  **تحليل المنافسة (Competitive Agent)**:
-    *   تقييم حواجز الدخول (Barriers to Entry).
-    *   تحليل الخندق التنافسي (Moat).
-    *   دراسة المخاطر التنافسية وإمكانية النسخ.
-
-4.  **الموائمة واتخاذ القرار (Synthesizer Agent)**:
-    *   تجميع التقارير الثلاثة.
-    *   الموازنة بين وجهات النظر المختلفة.
-    *   إصدار حكم نهائي (استثمار، حذر، رفض) مع نصائح استراتيجية.
-
-## 🛠️ التقنيات المستخدمة
-
-*   **Python**: لغة البرمجة الأساسية.
-*   **Flask**: إطار عمل الويب للواجهة الخلفية.
-*   **OpenAI API**: المحرك الذكي للعملاء (Agents).
-*   **Tailwind CSS**: لتصميم واجهة مستخدم عصرية وجذابة.
-*   **Asyncio**: لإدارة المعالجة المتوازية للعملاء لضمان السرعة.
-
-## 🚀 طريقة التثبيت والتشغيل
-
-اتبع الخطوات التالية لتشغيل المشروع على جهازك:
-
-### 1. المتطلبات المسبقة
-تأكد من تثبيت [Python](https://www.python.org/) على جهازك.
-
-### 2. استنساخ المستودع (Clone)
-قم بتحميل المشروع إلى جهازك:
-```bash
-git clone <رابط المستودع>
-cd investment-agent
-```
-
-### 3. تثبيت المكتبات اللازمة
-قم بتثبيت المتطلبات المسجلة في ملف `requirements.txt`:
-```bash
-pip install -r requirements.txt
-```
-
-### 4. تشغيل التطبيق
-قم بتشغيل خادم Flask:
-```bash
-python app.py
-```
-
-سيقوم المتصفح بفتح العنوان `http://localhost:5000` تلقائياً.
-
-## 💡 كيفية الاستخدام
-
-1.  بعد تشغيل التطبيق، ستظهر لك واجهة "Oracle AI".
-2.  أدخل **مفتاح API الخاص بـ OpenAI** في الحقل المخصص.
-3.  اكتب **فكرتك الاستثمارية** بالتفصيل في صندوق النص.
-4.  اضغط على زر **INITIALIZE ANALYSIS**.
-5.  استمتع بمشاهدة التحليل المتعمق من الزوايا الثلاث، ثم القرار النهائي!
-
-## 📂 هيكلية المشروع
-
-*   `app.py`: ملف التشغيل الرئيسي ونقاط الاتصال (Endpoints).
-*   `agents/`: يحتوي على كود العملاء الأذكياء:
-    *   `base.py`: الكلاس الأساسي للعملاء.
-    *   `market_logic.py`: عميل السوق.
-    *   `financial.py`: عميل المالية.
-    *   `competitive.py`: عميل المنافسة.
-    *   `synthesizer.py`: عميل القرار النهائي.
-*   `templates/`: ملفات HTML.
-*   `static/`: ملفات CSS و JavaScript (إن وجدت).
-
----
-
-**تم تطوير هذا المشروع كجزء من سلسلة تعليمية عن بناء أنظمة الوكلاء الذكية (AI Agents). لا تنسَ [مشاهدة الفيديو](https://youtu.be/S5shoHtZMAk) لفهم الكود بعمق!** ❤️
+## Features
+* **Multi-LLM Support:** Compatible with Google Gemini and OpenAI.
+* **Fast Analysis:** Asynchronous execution (`asyncio`) allows the Market, Financial, and Competitive agents to run concurrently.
+* **Modern Stack:** Built with a FastAPI backend and a clean HTML/Tailwind CSS frontend.
+* **Localization:** Primarily designed and configured for Arabic language interactions.

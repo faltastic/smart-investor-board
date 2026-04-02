@@ -59,7 +59,7 @@
     </script>
 
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
 </head>
 <body class="bg-darkBg text-white min-h-screen overflow-x-hidden selection:bg-neonBlue selection:text-black">
 
@@ -88,15 +88,58 @@
         <div class="bg-glass backdrop-blur-xl border border-glassBorder rounded-3xl p-8 md:p-10 shadow-2xl mb-20 transform transition hover:scale-[1.01] duration-500">
             <form id="analysis-form" class="space-y-8">
                 
+                <div class="grid md:grid-cols-1 gap-8 mb-8">
+                    <div class="group">
+                        <label class="block text-sm font-medium text-gray-400 mb-4 transition group-hover:text-neonBlue">AI PROVIDER</label>
+                        <div class="flex flex-row gap-4 md:w-1/2">
+                            <label class="flex-1 relative cursor-pointer">
+                                <input type="radio" name="provider" value="google" class="peer sr-only" checked>
+                                <div class="w-full bg-black/30 border border-gray-700 text-gray-400 rounded-xl px-5 py-4 focus:outline-none transition-all duration-300 text-center peer-checked:border-neonBlue peer-checked:text-white peer-checked:bg-neonBlue/10 hover:border-gray-500">
+                                    Google Gemini
+                                </div>
+                                <div class="absolute inset-0 rounded-xl bg-neonBlue opacity-0 transition duration-300 -z-10 blur peer-checked:opacity-10"></div>
+                            </label>
+                            <label class="flex-1 relative cursor-pointer">
+                                <input type="radio" name="provider" value="openai" class="peer sr-only" >
+                                <div class="w-full bg-black/30 border border-gray-700 text-gray-400 rounded-xl px-5 py-4 focus:outline-none transition-all duration-300 text-center peer-checked:border-neonBlue peer-checked:text-white peer-checked:bg-neonBlue/10 hover:border-gray-500">
+                                    OpenAI
+                                </div>
+                                <div class="absolute inset-0 rounded-xl bg-neonBlue opacity-0 transition duration-300 -z-10 blur peer-checked:opacity-10"></div>
+                            </label>
+                            
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid md:grid-cols-1 gap-8">
                     <div class="group">
-                        <label for="api-key" class="block text-sm font-medium text-gray-400 mb-2 transition group-hover:text-neonBlue">MEMBER ACCESS KEY (OpenAI API)</label>
+                        <label for="api-key" id="api-key-label" class="block text-sm font-medium text-gray-400 mb-2 transition group-hover:text-neonBlue">MEMBER ACCESS KEY (Gemini API)</label>
                         <div class="relative">
                             <input type="password" id="api-key" required 
                                 class="w-full bg-black/30 border border-gray-700 text-white rounded-xl px-5 py-4 focus:outline-none focus:border-neonBlue focus:ring-1 focus:ring-neonBlue transition-all duration-300 placeholder-gray-600 font-mono text-sm"
-                                placeholder="sk-...">
+                                placeholder="AIza...">
                             <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-neonBlue to-neonPurple opacity-0 transition duration-300 -z-10 blur group-hover:opacity-20"></div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="group">
+                    <label class="block text-sm font-medium text-gray-400 mb-4 transition group-hover:text-neonBlue">LANGUAGE</label>
+                    <div class="flex flex-row gap-4 md:w-1/2">
+                        <label class="flex-1 relative cursor-pointer">
+                            <input type="radio" name="language" value="arabic" class="peer sr-only" checked>
+                            <div class="w-full bg-black/30 border border-gray-700 text-gray-400 rounded-xl px-5 py-4 focus:outline-none transition-all duration-300 text-center peer-checked:border-neonBlue peer-checked:text-white peer-checked:bg-neonBlue/10 hover:border-gray-500">
+                                عربي
+                            </div>
+                            <div class="absolute inset-0 rounded-xl bg-neonBlue opacity-0 transition duration-300 -z-10 blur peer-checked:opacity-10"></div>
+                        </label>
+                        <label class="flex-1 relative cursor-pointer">
+                            <input type="radio" name="language" value="english" class="peer sr-only" >
+                            <div class="w-full bg-black/30 border border-gray-700 text-gray-400 rounded-xl px-5 py-4 focus:outline-none transition-all duration-300 text-center peer-checked:border-neonBlue peer-checked:text-white peer-checked:bg-neonBlue/10 hover:border-gray-500">
+                                English
+                            </div>
+                            <div class="absolute inset-0 rounded-xl bg-neonBlue opacity-0 transition duration-300 -z-10 blur peer-checked:opacity-10"></div>
+                        </label>
                     </div>
                 </div>
 
@@ -113,7 +156,7 @@
                 <button type="submit" id="submit-btn" class="w-full relative group overflow-hidden rounded-xl p-[1px]">
                     <div class="absolute inset-0 bg-gradient-to-r from-neonBlue via-neonPurple to-neonBlue opacity-70 group-hover:opacity-100 animate-gradient-x transition-opacity duration-300"></div>
                     <div class="relative bg-black rounded-xl px-8 py-5 flex items-center justify-center space-x-3 transition-colors duration-300 group-hover:bg-black/80">
-                        <span class="btn-text font-bold text-xl tracking-widest text-white">INITIALIZE ANALYSIS</span>
+                        <span class="btn-text font-bold text-xl tracking-wide text-white">ابدأ التحليل</span>
                         <div class="spinner hidden ml-3 w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     </div>
                 </button>
@@ -124,6 +167,39 @@
 
         <!-- Results Section -->
         <div id="results" class="hidden space-y-16">
+            <!-- Download Button -->
+            <div class="flex justify-center -mb-8">
+                <button id="download-btn" class="group relative overflow-hidden bg-neonBlue/10 hover:bg-neonBlue/20 border border-neonBlue/30 text-neonBlue px-8 py-3 rounded-2xl flex items-center gap-3 transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(0,243,255,0.1)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span id="download-text" class="font-bold tracking-wide">تحميل التقرير (MD)</span>
+                    <div class="absolute inset-0 bg-neonBlue opacity-0 group-hover:opacity-5 transition-opacity"></div>
+                </button>
+            </div>
+
+            <!-- Usage Statistics Section -->
+            <div id="usage-stats" class="hidden text-center mb-10 p-6 bg-glass backdrop-blur-md border border-glassBorder rounded-2xl shadow-xl">
+                <p class="text-lg font-semibold text-gray-300 mb-4">Analysis Overview</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-gray-400 text-sm font-mono tracking-wide">
+                    <div>
+                        <span class="block text-neonBlue font-bold">Provider:</span>
+                        <span id="usage-provider" class="text-white"></span>
+                    </div>
+                    <div>
+                        <span class="block text-neonBlue font-bold">Model Tier:</span>
+                        <span id="usage-model-level" class="text-white"></span>
+                    </div>
+                    <div>
+                        <span class="block text-neonBlue font-bold">Prompt Tokens:</span>
+                        <span id="usage-prompt-tokens" class="text-white"></span>
+                    </div>
+                    <div>
+                        <span class="block text-neonBlue font-bold">Completion Tokens:</span>
+                        <span id="usage-completion-tokens" class="text-white"></span>
+                    </div>
+                </div>
+            </div>
             
             <!-- Layer 1: Divergence -->
             <section>
@@ -140,7 +216,7 @@
                             <div class="p-6 border-b border-white/5 bg-gradient-to-b from-blue-500/10 to-transparent">
                                 <div class="flex justify-between items-center">
                                     <h3 class="text-xl font-bold text-blue-400">Market Logic</h3>
-                                    <span class="text-xs font-mono text-blue-500/70 border border-blue-500/30 px-2 py-1 rounded">GPT-5-MINI</span>
+                                    <!-- <span class="text-xs font-mono text-blue-500/70 border border-blue-500/30 px-2 py-1 rounded">GPT-5-MINI</span> -->
                                 </div>
                             </div>
                             <div class="p-6 prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed markdown-content" id="market-result"></div>
@@ -153,7 +229,7 @@
                             <div class="p-6 border-b border-white/5 bg-gradient-to-b from-emerald-500/10 to-transparent">
                                 <div class="flex justify-between items-center">
                                     <h3 class="text-xl font-bold text-emerald-400">Financials</h3>
-                                    <span class="text-xs font-mono text-emerald-500/70 border border-emerald-500/30 px-2 py-1 rounded">GPT-5-MINI</span>
+                                    <!-- <span class="text-xs font-mono text-emerald-500/70 border border-emerald-500/30 px-2 py-1 rounded">GPT-5-MINI</span> -->
                                 </div>
                             </div>
                             <div class="p-6 prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed markdown-content" id="financial-result"></div>
@@ -166,7 +242,7 @@
                             <div class="p-6 border-b border-white/5 bg-gradient-to-b from-violet-500/10 to-transparent">
                                 <div class="flex justify-between items-center">
                                     <h3 class="text-xl font-bold text-violet-400">Competitive</h3>
-                                    <span class="text-xs font-mono text-violet-500/70 border border-violet-500/30 px-2 py-1 rounded">GPT-5-MINI</span>
+                                    <!-- <span class="text-xs font-mono text-violet-500/70 border border-violet-500/30 px-2 py-1 rounded">GPT-5-MINI</span> -->
                                 </div>
                             </div>
                             <div class="p-6 prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed markdown-content" id="competitive-result"></div>
@@ -213,7 +289,84 @@
         const btnText = submitBtn.querySelector('.btn-text');
         const spinner = submitBtn.querySelector('.spinner');
         const results = document.getElementById('results');
+        const downloadBtn = document.getElementById('download-btn');
+        const downloadText = document.getElementById('download-text');
         const errorMessage = document.getElementById('error-message');
+        const providerRadios = document.querySelectorAll('input[name="provider"]');
+        const apiKeyLabel = document.getElementById('api-key-label');
+        const apiKeyInput = document.getElementById('api-key');
+        const ideaInput = document.getElementById('idea');
+        const languageRadios = document.querySelectorAll('input[name="language"]');
+
+        let lastAnalysisData = null;
+
+        const placeholders = {
+            arabic: "صف فكرتك الاستثمارية بعمق هنا... النظام سيقوم بتحليلها عبر 3 مسارات متوازية.",
+            english: "Describe your investment idea in depth here... The system will analyze it through 3 parallel paths."
+        };
+
+        const buttonTexts = {
+            arabic: "ابدأ التحليل",
+            english: "INITIALIZE ANALYSIS"
+        };
+
+        const downloadTexts = {
+            arabic: "تحميل التقرير (MD)",
+            english: "DOWNLOAD REPORT (MD)"
+        };
+
+        const loadingTexts = {
+            arabic: "جاري تحليل البيانات...",
+            english: "PROCESSING DATA STREAMS..."
+        };
+
+        languageRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const lang = e.target.value;
+                ideaInput.placeholder = placeholders[lang];
+                btnText.textContent = buttonTexts[lang];
+                downloadText.textContent = downloadTexts[lang];
+            });
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (!lastAnalysisData) return;
+            
+            const lang = document.querySelector('input[name="language"]:checked').value;
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const fileName = `Oracle_Analysis_${timestamp}.md`;
+            
+            let mdContent = "";
+            if (lang === 'arabic') {
+                mdContent = `# تقرير تحليل الاستثمار - Oracle AI\n\n`;
+                mdContent += `## الفكرة الاستثمارية\n${lastAnalysisData.idea}\n\n`;
+                mdContent += `---\n\n`;
+                mdContent += `## 1. تحليل منطق السوق (Market Logic)\n${lastAnalysisData.market_analysis}\n\n`;
+                mdContent += `## 2. التحليل المالي (Financials)\n${lastAnalysisData.financial_analysis}\n\n`;
+                mdContent += `## 3. التحليل التنافسي (Competitive)\n${lastAnalysisData.competitive_analysis}\n\n`;
+                mdContent += `---\n\n`;
+                mdContent += `## القرار النهائي (Final Verdict)\n${lastAnalysisData.final_verdict}\n\n`;
+            } else {
+                mdContent = `# Investment Analysis Report - Oracle AI\n\n`;
+                mdContent += `## Investment Idea\n${lastAnalysisData.idea}\n\n`;
+                mdContent += `---\n\n`;
+                mdContent += `## 1. Market Logic Analysis\n${lastAnalysisData.market_analysis}\n\n`;
+                mdContent += `## 2. Financial Analysis\n${lastAnalysisData.financial_analysis}\n\n`;
+                mdContent += `## 3. Competitive Analysis\n${lastAnalysisData.competitive_analysis}\n\n`;
+                mdContent += `---\n\n`;
+                mdContent += `## Final Verdict\n${lastAnalysisData.final_verdict}\n\n`;
+            }
+
+            const blob = new Blob([mdContent], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
 
         // Configure Marked.js options
         marked.setOptions({
@@ -227,9 +380,11 @@
             
             const apiKey = document.getElementById('api-key').value;
             const idea = document.getElementById('idea').value;
+            const provider = document.querySelector('input[name="provider"]:checked').value;
+            const language = document.querySelector('input[name="language"]:checked').value;
             
             // UI Loading State
-            btnText.textContent = 'PROCESSING DATA STREAMS...';
+            btnText.textContent = loadingTexts[language];
             spinner.classList.remove('hidden');
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-80', 'cursor-wait');
@@ -244,7 +399,7 @@
                 const response = await fetch('/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idea, api_key: apiKey })
+                    body: JSON.stringify({ idea, api_key: apiKey, provider, language })
                 });
                 
                 const data = await response.json();
@@ -253,12 +408,34 @@
                     throw new Error(data.error);
                 }
                 
+                // Store data for download
+                lastAnalysisData = {
+                    idea,
+                    ...data
+                };
+
                 // Render Markdown content using marked.parse()
-                document.getElementById('market-result').innerHTML = marked.parse(data.market_analysis);
-                document.getElementById('financial-result').innerHTML = marked.parse(data.financial_analysis);
-                document.getElementById('competitive-result').innerHTML = marked.parse(data.competitive_analysis);
-                document.getElementById('final-verdict').innerHTML = marked.parse(data.final_verdict);
+                document.getElementById('market-result').innerHTML = marked.parse(data.market_analysis || '*No response generated.*');
+                document.getElementById('financial-result').innerHTML = marked.parse(data.financial_analysis || '*No response generated.*');
+                document.getElementById('competitive-result').innerHTML = marked.parse(data.competitive_analysis || '*No response generated.*');
+                document.getElementById('final-verdict').innerHTML = marked.parse(data.final_verdict || '*No response generated.*');
+
+                // Populate Usage Statistics
+                if (data.usage_metadata) {
+                    document.getElementById('usage-provider').textContent = data.usage_metadata.provider;
+                    document.getElementById('usage-model-level').textContent = data.usage_metadata.model_level;
+                    document.getElementById('usage-prompt-tokens').textContent = data.usage_metadata.total_prompt_tokens;
+                    document.getElementById('usage-completion-tokens').textContent = data.usage_metadata.total_completion_tokens;
+                    document.getElementById('usage-stats').classList.remove('hidden');
+                }
                 
+                // Set text direction for results section
+                if (language === 'english') {
+                    results.setAttribute('dir', 'ltr');
+                } else {
+                    results.setAttribute('dir', 'rtl');
+                }
+
                 // Reveal Results with animation
                 results.classList.remove('hidden');
                 
@@ -272,7 +449,7 @@
                 errorMessage.classList.remove('hidden');
             } finally {
                 // Reset UI State
-                btnText.textContent = 'INITIALIZE ANALYSIS';
+                btnText.textContent = buttonTexts[language];
                 spinner.classList.add('hidden');
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('opacity-80', 'cursor-wait');
